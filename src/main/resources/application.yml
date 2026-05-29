@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: fincore-platform
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/fincore}
+    username: ${DATABASE_USERNAME:fincore}
+    password: ${DATABASE_PASSWORD:fincore}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+server:
+  port: ${SERVER_PORT:8080}
+
