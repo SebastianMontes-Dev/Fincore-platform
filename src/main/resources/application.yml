@@ -2,22 +2,64 @@ spring:
   application:
     name: fincore-platform
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/fincore}
-    username: ${DATABASE_USERNAME:fincore}
-    password: ${DATABASE_PASSWORD:fincore}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/fincore}
+    username: ${DB_USER:fincore}
+    password: ${DB_PASSWORD:fincore}
   jpa:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
+    consumer:
+      group-id: fincore-platform-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+  autoconfigure:
+    exclude:
 
 server:
   port: ${SERVER_PORT:8080}
 
+app:
+  jwt:
+    secret: ${JWT_SECRET:clave-super-secreta-para-fincore-plataforma-32bytes-min}
+    access-token-expiration: ${ACCESS_TOKEN_MINUTES:15}
+    refresh-token-expiration-days: ${REFRESH_TOKEN_DAYS:7}
+  base-url: ${APP_BASE_URL:http://localhost:8080}
+  api:
+    rate-limit-requests-per-minute: 100
+  reports:
+    storage-path: ${REPORTS_PATH:./reports}
+  webhook:
+    max-retries: 3
+    retry-backoff-seconds: 60
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
