@@ -1,0 +1,206 @@
+{
+  "info": {
+    "name": "FinCore Platform - Infraestructura",
+    "description": "Coleccion de Postman con todos los endpoints del modulo de infraestructura de FinCore.\n\nFlujo: 1. Registrar empresa  2. Registrar usuario  3. Verificar email  4. Login  5. Usar el token",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Registrar Usuario",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": {"mode":"raw","raw":"{\"email\":\"juan@tacos.com\",\"password\":\"MiPass123\",\"nombre\":\"Juan\",\"apellido\":\"Perez\"}"},
+            "url": {"raw":"http://localhost:8080/api/v1/usuarios/registro","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","usuarios","registro"]}
+          }
+        },
+        {
+          "name": "Login",
+          "event": [{"listen":"test","script":{"exec":["var j=JSON.parse(responseBody);","pm.environment.set('token',j.accessToken);","pm.environment.set('refresh',j.refreshToken);"],"type":"text/javascript"}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": {"mode":"raw","raw":"{\"email\":\"juan@tacos.com\",\"password\":\"MiPass123\"}"},
+            "url": {"raw":"http://localhost:8080/api/v1/auth/login","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","auth","login"]}
+          }
+        },
+        {
+          "name": "Refrescar Token",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": {"mode":"raw","raw":"{\"refreshToken\":\"{{refresh}}\"}"},
+            "url": {"raw":"http://localhost:8080/api/v1/auth/refrescar","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","auth","refrescar"]}
+          }
+        },
+        {
+          "name": "Cambiar Empresa",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{token}}"}],
+            "body": {"mode":"raw","raw":"{\"empresaId\":\"pega_el_id\"}"},
+            "url": {"raw":"http://localhost:8080/api/v1/auth/cambiar-empresa","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","auth","cambiar-empresa"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Empresas",
+      "item": [
+        {
+          "name": "Registrar Empresa",
+          "event": [{"listen":"test","script":{"exec":["var j=JSON.parse(responseBody);","pm.environment.set('empresa_id',j.id);"],"type":"text/javascript"}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": {"mode":"raw","raw":"{\"nombre\":\"Tacos El Gordo\",\"email\":\"contacto@tacos.com\",\"telefono\":\"555-1234\",\"direccion\":\"Av. Revolucion 123, CDMX\"}"},
+            "url": {"raw":"http://localhost:8080/api/v1/empresas/registro","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","empresas","registro"]}
+          }
+        },
+        {
+          "name": "Ver Empresa",
+          "request": {
+            "method": "GET",
+            "header": [{"key":"Authorization","value":"Bearer {{token}}"}],
+            "url": {"raw":"http://localhost:8080/api/v1/empresas/{{empresa_id}}","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","empresas","{{empresa_id}}"]}
+          }
+        },
+        {
+          "name": "Invitar Usuario",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{token}}"}],
+            "body": {"mode":"raw","raw":"{\"email\":\"maria@tacos.com\",\"rol\":\"ANALYST\"}"},
+            "url": {"raw":"http://localhost:8080/api/v1/empresas/{{empresa_id}}/invitar","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","empresas","{{empresa_id}}","invitar"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "API Keys",
+      "item": [
+        {
+          "name": "Generar API Key",
+          "event": [{"listen":"test","script":{"exec":["var j=JSON.parse(responseBody);","pm.environment.set('api_key',j.apiKey);","pm.environment.set('api_key_id',j.id);"],"type":"text/javascript"}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{token}}"}],
+            "body": {"mode":"raw","raw":"{\"nombre\":\"Mi App\"}"},
+            "url": {"raw":"http://localhost:8080/api/v1/empresas/{{empresa_id}}/api-keys","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","empresas","{{empresa_id}}","api-keys"]}
+          }
+        },
+        {
+          "name": "Listar API Keys",
+          "request": {
+            "method": "GET",
+            "header": [{"key":"Authorization","value":"Bearer {{token}}"}],
+            "url": {"raw":"http://localhost:8080/api/v1/empresas/{{empresa_id}}/api-keys","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","empresas","{{empresa_id}}","api-keys"]}
+          }
+        },
+        {
+          "name": "Revocar API Key",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key":"Authorization","value":"Bearer {{token}}"}],
+            "url": {"raw":"http://localhost:8080/api/v1/empresas/{{empresa_id}}/api-keys/{{api_key_id}}","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","empresas","{{empresa_id}}","api-keys","{{api_key_id}}"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "API Publica",
+      "item": [
+        {
+          "name": "Registrar Transaccion Externa",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"},{"key":"X-API-Key","value":"{{api_key}}"}],
+            "body": {"mode":"raw","raw":"{\"tipo\":\"INGRESO\",\"monto\":1500.00,\"descripcion\":\"Venta de tacos\",\"categoria\":\"Ventas\",\"fecha\":\"2025-05-29T10:30:00\"}"},
+            "url": {"raw":"http://localhost:8080/api/v1/publico/transacciones","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","publico","transacciones"]}
+          }
+        },
+        {
+          "name": "Ping",
+          "request": {
+            "method": "GET",
+            "url": {"raw":"http://localhost:8080/api/v1/publico/ping","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","publico","ping"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reportes",
+      "item": [
+        {
+          "name": "Solicitar Reporte Manual",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Authorization","value":"Bearer {{token}}"}],
+            "url": {"raw":"http://localhost:8080/api/v1/reportes/{{empresa_id}}?mes=5&anio=2025","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","reportes","{{empresa_id}}"],"query":[{"key":"mes","value":"5"},{"key":"anio","value":"2025"}]}
+          }
+        },
+        {
+          "name": "Listar Reportes",
+          "request": {
+            "method": "GET",
+            "header": [{"key":"Authorization","value":"Bearer {{token}}"}],
+            "url": {"raw":"http://localhost:8080/api/v1/reportes/empresa/{{empresa_id}}","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","reportes","empresa","{{empresa_id}}"]}
+          }
+        },
+        {
+          "name": "Descargar PDF",
+          "request": {
+            "method": "GET",
+            "header": [{"key":"Authorization","value":"Bearer {{token}}"}],
+            "url": {"raw":"http://localhost:8080/api/v1/reportes/pega_id/descargar","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","reportes","pega_id","descargar"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notificaciones",
+      "item": [
+        {
+          "name": "Listar Notificaciones",
+          "request": {
+            "method": "GET",
+            "header": [{"key":"Authorization","value":"Bearer {{token}}"}],
+            "url": {"raw":"http://localhost:8080/api/v1/notificaciones/usuario/pega_id","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","notificaciones","usuario","pega_id"]}
+          }
+        },
+        {
+          "name": "Configurar Webhook",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{token}}"}],
+            "body": {"mode":"raw","raw":"{\"urlWebhook\":\"https://hooks.mi-app.com/fincore\"}"},
+            "url": {"raw":"http://localhost:8080/api/v1/empresas/{{empresa_id}}/webhook","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","empresas","{{empresa_id}}","webhook"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Utilidades",
+      "item": [
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{"key":"Authorization","value":"Bearer {{token}}"}],
+            "url": {"raw":"http://localhost:8080/api/v1/dashboard","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","dashboard"]}
+          }
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": {"raw":"http://localhost:8080/api/v1/health","protocol":"http","host":["localhost"],"port":"8080","path":["api","v1","health"]}
+          }
+        }
+      ]
+    }
+  ]
+}
